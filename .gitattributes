@@ -1,0 +1,8 @@
+# Forçar o GitHub a detectar o projeto como C#
+*.cs linguist-detectable=true
+*.csproj linguist-detectable=true
+*.sln linguist-detectable=true
+
+# Marcar pastas de Front-end como documentação ou vendor para não "poluir" a estatística de linguagem
+src/FinancialControl.Desktop/** linguist-documentation=true
+src/financial_control_mobile/** linguist-documentation=true

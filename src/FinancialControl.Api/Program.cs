@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -21,24 +22,31 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddDbContext<FinancialDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<TransactionValidator>();
 
-var frontendUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:5173";
+
+var reactUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:5173";
+var flutterUrl = "http://localhost:5174";
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("ReactPolicy", policy =>
+    options.AddPolicy("MultiPlatformPolicy", policy =>
     {
-        policy.WithOrigins(frontendUrl)
+        policy.WithOrigins(reactUrl, flutterUrl)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
+
 
 builder.Services.AddMassTransit(x =>
 {
@@ -54,14 +62,19 @@ builder.Services.AddMassTransit(x =>
 
 var app = builder.Build();
 
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors("ReactPolicy");
-app.UseHttpsRedirection();
+
+app.UseCors("MultiPlatformPolicy");
+
+
+
+
 app.UseAuthorization();
 app.MapControllers();
 

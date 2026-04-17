@@ -16,13 +16,12 @@ public class TransactionCreatedConsumer : IConsumer<TransactionCreatedEvent>
     {
         var message = context.Message;
 
-        // lógica de negócio (Ex: Atualizar saldo no banco)
-        _logger.LogInformation("Recebendo transação: {Id} - {Description} no valor de R$ {Amount}",
+        // Log estruturado: facilita buscas em ferramentas como ElasticSearch ou Seq no futuro
+        _logger.LogInformation("Processando Transação Financeira: {Id} | Descrição: {Description} | Valor: {Amount}",
             message.Id, message.Description, message.Amount);
 
-        // Simulando um processamento pesado
-        await Task.Delay(1000);
+        await Task.Delay(500); // Simulando trabalho
 
-        _logger.LogInformation("Transação {Id} processada com sucesso!", message.Id);
+        _logger.LogInformation("✅ Sucesso: Transação {Id} integrada ao sistema.", message.Id);
     }
 }

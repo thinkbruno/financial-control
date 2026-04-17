@@ -94,6 +94,14 @@ flutter run -d chrome --web-port 5174
 
 ---
 
+## Demonstração do Ecossistema
+
+<p align="center">
+  <img src="docs/screenshot.png" alt="Dashboard React e Flutter" width="800">
+</p>
+
+---
+
 ## Status do Projeto
 
 - [x] API com PostgreSQL integrada.

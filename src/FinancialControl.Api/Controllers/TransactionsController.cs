@@ -34,10 +34,13 @@ public class TransactionsController : ControllerBase
         if (transaction == null)
             return BadRequest("Dados da transação inválidos.");
 
-        // Persistência síncrona no Banco de Dados
+
+        transaction.Id = Guid.NewGuid();
+
+        // Persistência no Banco de Dados (Postgres)
         await _repository.AddAsync(transaction);
 
-        // Publicação assíncrona do evento para o RabbitMQ
+        // Publicação do evento para o RabbitMQ (Worker)
         await _publishEndpoint.Publish(new TransactionCreatedEvent(
             transaction.Id,
             transaction.Amount,

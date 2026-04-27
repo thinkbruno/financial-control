@@ -1,52 +1,39 @@
-using FinancialControl.Domain.Entities;
+using FinancialControl.Application.UseCases.Transactions;
 using FinancialControl.Domain.Interfaces;
-using FinancialControl.Domain.Events;
-using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialControl.Api.Controllers;
+
 
 [ApiController]
 [Route("api/[controller]")]
 public class TransactionsController : ControllerBase
 {
-    private readonly ITransactionRepository _repository;
-    private readonly IPublishEndpoint _publishEndpoint;
+    private readonly GetAllTransactionsUseCase _getAllTransactionsUseCase;
+    private readonly CreateTransactionUseCase _createTransactionUseCase;
 
     public TransactionsController(
-        ITransactionRepository repository,
-        IPublishEndpoint publishEndpoint)
+     CreateTransactionUseCase createTransactionUseCase,
+     GetAllTransactionsUseCase getAllTransactionsUseCase)
     {
-        _repository = repository;
-        _publishEndpoint = publishEndpoint;
+        _createTransactionUseCase = createTransactionUseCase;
+        _getAllTransactionsUseCase = getAllTransactionsUseCase;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var transactions = await _repository.GetAllAsync();
+        var transactions = await _getAllTransactionsUseCase.Execute();
         return Ok(transactions);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Transaction transaction)
+    public async Task<IActionResult> Create([FromBody] CreateTransactionInput input)
     {
-        if (transaction == null)
+        if (input == null)
             return BadRequest("Dados da transação inválidos.");
 
-
-        transaction.Id = Guid.NewGuid();
-
-        // Persistência no Banco de Dados (Postgres)
-        await _repository.AddAsync(transaction);
-
-        // Publicação do evento para o RabbitMQ (Worker)
-        await _publishEndpoint.Publish(new TransactionCreatedEvent(
-            transaction.Id,
-            transaction.Amount,
-            transaction.Description,
-            transaction.Type.ToString()
-        ));
+        var transaction = await _createTransactionUseCase.Execute(input);
 
         return CreatedAtAction(nameof(GetAll), new { id = transaction.Id }, transaction);
     }

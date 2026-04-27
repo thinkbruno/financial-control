@@ -1,16 +1,16 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using FinancialControl.Application.UseCases.Transactions;
 using FinancialControl.Domain.Interfaces;
 using FinancialControl.Infrastructure.Context;
 using FinancialControl.Infrastructure.Repositories;
+using FinancialControl.Domain.Validators;
 using Microsoft.EntityFrameworkCore;
 using MassTransit;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using FinancialControl.Domain.Validators;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -22,13 +22,13 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 builder.Services.AddDbContext<FinancialDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
+builder.Services.AddScoped<CreateTransactionUseCase>();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<TransactionValidator>();
@@ -47,7 +47,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
@@ -60,8 +59,9 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-var app = builder.Build();
+builder.Services.AddScoped<GetAllTransactionsUseCase>();
 
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -69,13 +69,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseCors("MultiPlatformPolicy");
 
-
-
-
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

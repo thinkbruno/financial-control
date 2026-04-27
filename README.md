@@ -7,18 +7,87 @@ foco em escalabilidade, mensageria e arquitetura limpa.
 
 ## Arquitetura do Projeto
 
-O ecossistema é dividido em uma API centralizada que atende diferentes
-clientes, utilizando **Clean Architecture** no back-end para garantir o
-desacoplamento das regras de negócio.
+O sistema foi projetado seguindo princípios de **Clean Architecture + DDD (Domain-Driven Design)**, com separação clara de responsabilidades:
+
+Api → Application → Domain ← Infrastructure
+
+---
+
+### Camadas
+
+- Domain: regras de negócio, entidades e validações
+- Application: casos de uso (commands e queries)
+- Infrastructure: acesso a dados e integrações externas
+- API: camada de entrada (HTTP)
+
+---
+
+## Principais Evoluções Arquiteturais
+
+- Introdução de UseCases (Command + Query)
+- Remoção de lógica dos controllers
+- Implementação de DDD básico (entidade rica)
+- Separação entre entrada (DTO) e domínio
+- Orquestração centralizada na camada de aplicação
+- Uso de eventos assíncronos (RabbitMQ + MassTransit)
+- Testes unitários com mock de dependências
+- Código preparado para escalabilidade e manutenção
+
+---
 
 ### Tecnologias Principais
 
-- **Back-end:** .NET 8 (C#)
-- **Front-end Web:** React + TypeScript + Tailwind CSS
-- **Mobile:** Flutter (Dart)
-- **Banco de Dados:** PostgreSQL
-- **Mensageria:** RabbitMQ + MassTransit
-- **Containerização:** Docker & Docker Compose
+- Back-end: .NET 8 (C#)
+- Front-end Web: React + TypeScript + Tailwind CSS
+- Mobile: Flutter (Dart)
+- Banco de Dados: PostgreSQL
+- Mensageria: RabbitMQ + MassTransit
+- Testes: xUnit + Moq
+- Containerização: Docker & Docker Compose
+
+---
+
+## Estrutura do Backend
+
+src/
+FinancialControl.Api
+FinancialControl.Application
+FinancialControl.Domain
+FinancialControl.Infrastructure
+FinancialControl.Worker
+
+---
+
+## Padrões Utilizados
+
+- Clean Architecture
+- Domain-Driven Design (DDD)
+- Dependency Injection
+- Event-Driven Architecture
+- Separation of Concerns
+- SOLID
+
+---
+
+## Fluxo de Criação de Transação
+
+1. Controller recebe requisição HTTP
+2. Envia para o UseCase
+3. UseCase:
+   - Cria entidade com regras de domínio
+   - Persiste via repository
+   - Publica evento no RabbitMQ
+4. Worker processa o evento
+
+---
+
+## Testes
+
+Executar:
+
+```bash
+dotnet test
+```
 
 ---
 

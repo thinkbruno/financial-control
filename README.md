@@ -49,12 +49,14 @@ Api → Application → Domain ← Infrastructure
 
 ## Estrutura do Backend
 
+```plaintext
 src/
-FinancialControl.Api
-FinancialControl.Application
-FinancialControl.Domain
-FinancialControl.Infrastructure
-FinancialControl.Worker
+├── FinancialControl.Api            # Camada de entrada (HTTP)
+├── FinancialControl.Application    # Casos de uso
+├── FinancialControl.Domain         # Regras de negócio
+├── FinancialControl.Infrastructure # Banco e integrações
+└── FinancialControl.Worker         # Processamento assíncrono
+```
 
 ---
 

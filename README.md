@@ -1,190 +1,192 @@
-# FinancialControl.io
+# Financial Control
 
-Sistema completo de controle financeiro multiplataforma desenvolvido com
-foco em escalabilidade, mensageria e arquitetura limpa.
-
----
-
-## Arquitetura do Projeto
-
-O sistema foi projetado seguindo princípios de **Clean Architecture + DDD (Domain-Driven Design)**, com separação clara de responsabilidades:
-
-Api → Application → Domain ← Infrastructure
+Sistema de controle financeiro com foco em arquitetura limpa, desacoplamento e escalabilidade.
 
 ---
 
-### Camadas
+## Visão Geral
 
-- Domain: regras de negócio, entidades e validações
-- Application: casos de uso (commands e queries)
-- Infrastructure: acesso a dados e integrações externas
-- API: camada de entrada (HTTP)
+Aplicação backend para gerenciamento de transações financeiras (receitas e despesas), construída com princípios de Clean Architecture e Domain-Driven Design (DDD).
 
----
-
-## Principais Evoluções Arquiteturais
-
-- Introdução de UseCases (Command + Query)
-- Remoção de lógica dos controllers
-- Implementação de DDD básico (entidade rica)
-- Separação entre entrada (DTO) e domínio
-- Orquestração centralizada na camada de aplicação
-- Uso de eventos assíncronos (RabbitMQ + MassTransit)
-- Testes unitários com mock de dependências
-- Código preparado para escalabilidade e manutenção
+O sistema suporta processamento assíncrono via eventos, permitindo evolução para cenários distribuídos.
 
 ---
 
-### Tecnologias Principais
+## Arquitetura
 
-- Back-end: .NET 8 (C#)
-- Front-end Web: React + TypeScript + Tailwind CSS
-- Mobile: Flutter (Dart)
-- Banco de Dados: PostgreSQL
-- Mensageria: RabbitMQ + MassTransit
-- Testes: xUnit + Moq
-- Containerização: Docker & Docker Compose
+O projeto está estruturado em camadas:
+
+- API → entrada HTTP
+- Application → casos de uso
+- Domain → regras de negócio
+- Infrastructure → persistência e mensageria
+- Worker → consumo de eventos
+
+### Diagrama de Arquitetura
+
+    ┌──────────────┐
+    │     API      │
+    └──────┬───────┘
+           │
+    ┌──────▼───────┐
+    │ Application  │
+    │ (Use Cases)  │
+    └──────┬───────┘
+           │
+    ┌──────▼───────┐
+    │   Domain     │
+    │ (Entities)   │
+    └──────┬───────┘
+           │
+    ┌──────▼───────────────┐
+    │   Infrastructure     │
+    │ EF Core + RabbitMQ   │
+    └─────────┬────────────┘
+              │
+       ┌──────▼──────┐
+       │   Worker    │
+       │ (Consumers) │
+       └─────────────┘
 
 ---
 
-## Estrutura do Backend
+## Tecnologias
 
-```plaintext
-src/
-├── FinancialControl.Api            # Camada de entrada (HTTP)
-├── FinancialControl.Application    # Casos de uso
-├── FinancialControl.Domain         # Regras de negócio
-├── FinancialControl.Infrastructure # Banco e integrações
-└── FinancialControl.Worker         # Processamento assíncrono
-```
-
----
-
-## Padrões Utilizados
-
-- Clean Architecture
-- Domain-Driven Design (DDD)
-- Dependency Injection
-- Event-Driven Architecture
-- Separation of Concerns
-- SOLID
+- .NET 8
+- ASP.NET Core
+- Entity Framework Core
+- PostgreSQL
+- MassTransit
+- RabbitMQ
+- xUnit
+- Moq
 
 ---
 
 ## Fluxo de Criação de Transação
 
-1. Controller recebe requisição HTTP
-2. Envia para o UseCase
-3. UseCase:
-   - Cria entidade com regras de domínio
-   - Persiste via repository
-   - Publica evento no RabbitMQ
-4. Worker processa o evento
+Client → API → UseCase → Domain → Repository → Database
+↓
+EventPublisher
+↓
+RabbitMQ
+↓
+Worker
+
+---
+
+## Exemplo de API
+
+### Criar Transação
+
+POST `/transactions`
+
+Request:
+
+{
+"description": "Salário",
+"amount": 5000,
+"date": "2026-01-01T00:00:00Z",
+"type": "Income",
+"category": "Salário"
+}
+
+Response:
+
+{
+"id": "uuid",
+"description": "Salário",
+"amount": 5000,
+"type": "Income"
+}
+
+---
+
+### Listar Transações
+
+GET `/transactions`
+
+Response:
+
+[
+{
+"id": "uuid",
+"description": "Salário",
+"amount": 5000,
+"type": "Income"
+}
+]
 
 ---
 
 ## Testes
 
-Executar:
+- Testes unitários com xUnit
+- Mock de dependências com Moq
+- Validação de comportamento (AAA)
 
-```bash
+---
+
+## Como Executar
+
+Build:
+
+dotnet build
+
+Executar API:
+
+dotnet run --project src/FinancialControl.Api
+
+Executar Worker:
+
+dotnet run --project src/FinancialControl.Worker
+
+Rodar testes:
+
 dotnet test
-```
 
 ---
 
-## Módulos do Sistema
+## Configuração
 
-### 1. API Central (.NET 8)
+Arquivo:
 
-- Implementação de **Clean Architecture** (Domain, Application,
-  Infrastructure, Api).
-- **Entity Framework Core** para persistência no PostgreSQL.
-- **FluentValidation** para regras de entrada de dados.
-- **CORS** configurado para múltiplos ambientes (Web e Mobile).
-- **Swagger/OpenAPI** para documentação e testes de endpoints.
+src/FinancialControl.Api/appsettings.json
 
-### 2. Dashboard Web (React)
+Exemplo:
 
-- SPA moderna focada em gestão de fluxo de caixa.
-- Consumo de API via **Axios**.
-- Estilização responsiva com **Tailwind**.
-
-### 3. Mobile App (Flutter)
-
-- Aplicativo multiplataforma para acompanhamento em tempo real.
-- Gerenciamento de estado e consumo de API com **Dio**.
-- Formatação de moeda brasileira com o pacote **Intl**.
-
-### 4. Background Worker (Mensageria)
-
-- Processamento assíncrono de transações via **RabbitMQ**.
-- Utilização de **MassTransit** para abstração de barramento de
-  eventos.
+{
+"ConnectionStrings": {
+"DefaultConnection": "Host=localhost;Port=5432;Database=financial;Username=postgres;Password=postgres"
+}
+}
 
 ---
 
-## Como Rodar o Projeto
+## Decisões Técnicas
 
-### Pré-requisitos
-
-- .NET 8 SDK
-- Node.js & npm
-- Flutter SDK
-- Docker & Docker Compose
-
-### Passo a Passo
-
-#### 1. Subir os serviços (PostgreSQL & RabbitMQ)
-
-```bash
-docker-compose up -d
-```
-
-#### 2. Rodar a API
-
-```bash
-cd src/FinancialControl.Api
-dotnet run
-```
-
-#### 3. Rodar o Dashboard React
-
-```bash
-cd src/FinancialControl.Desktop
-npm install
-npm run dev
-```
-
-#### 4. Rodar o App Flutter (Web)
-
-```bash
-cd src/financial_control_mobile
-flutter run -d chrome --web-port 5174
-```
+- Application desacoplada de infraestrutura via interfaces
+- Uso de eventos para comunicação assíncrona
+- Domínio isolado e responsável pelas regras de negócio
+- Testes focados em comportamento
 
 ---
 
-## Demonstração do Ecossistema
+## Evolução do Projeto
 
-<p align="center">
-  <img src="docs/screenshot.png" alt="Dashboard React e Flutter" width="800">
-</p>
+O sistema foi desenvolvido de forma incremental:
 
----
-
-## Status do Projeto
-
-- [x] API com PostgreSQL integrada.
-- [x] Integração com RabbitMQ concluída.
-- [x] Dashboard React funcional.
-- [x] App Flutter (v1) integrado.
-- [ ] Cadastro de novas transações via Mobile.
-- [ ] Gráficos de performance financeira.
+1. Modelo simples (CRUD)
+2. Introdução de camadas
+3. Aplicação de DDD
+4. Adição de mensageria
+5. Refatoração para desacoplamento total
 
 ---
 
 ## Autor
 
-Desenvolvido por **Bruno Ramos**\
-Portfolio: [brunoramos.tec.br](https://brunoramos.tec.br/)
+Bruno Ramos
+
+Acesse meu portfólio:  
+[www.brunoramos.tec.br](https://www.brunoramos.tec.br)

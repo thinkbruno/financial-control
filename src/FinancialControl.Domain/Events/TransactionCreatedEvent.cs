@@ -1,8 +1,12 @@
 namespace FinancialControl.Domain.Events;
 
+using FinancialControl.Domain.Entities;
+
 public record TransactionCreatedEvent(
-    Guid Id,
+    Guid TransactionId,
     decimal Amount,
     string Description,
-    string Type
+    TransactionType Type,
+    string Category,
+    DateTime OccurredAt
 );

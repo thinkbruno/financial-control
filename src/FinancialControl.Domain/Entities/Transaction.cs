@@ -25,36 +25,65 @@ public class Transaction
         TransactionType type,
         string category)
     {
-        Validate(description, amount, date, category);
-
-        return new Transaction
+        var transaction = new Transaction
         {
             Id = Guid.NewGuid(),
-            Description = description,
-            Amount = amount,
-            Date = date,
-            Type = type,
-            Category = category,
             CreatedAt = DateTime.UtcNow
         };
+
+        transaction.SetDescription(description);
+        transaction.SetAmount(amount, type);
+        transaction.SetDate(date);
+        transaction.SetCategory(category);
+
+        transaction.Type = type;
+
+        return transaction;
     }
 
-    private static void Validate(
+    public void Update(
         string description,
         decimal amount,
         DateTime date,
         string category)
     {
+        SetDescription(description);
+        SetAmount(amount, Type);
+        SetDate(date);
+        SetCategory(category);
+    }
+
+    private void SetDescription(string description)
+    {
         if (string.IsNullOrWhiteSpace(description))
-            throw new ArgumentException("Descrição é obrigatória");
+            throw new InvalidOperationException("Descrição é obrigatória");
 
+        Description = description;
+    }
+
+    private void SetAmount(decimal amount, TransactionType type)
+    {
         if (amount <= 0)
-            throw new ArgumentException("Valor deve ser maior que zero");
+            throw new InvalidOperationException("Valor deve ser maior que zero");
 
-        if (string.IsNullOrWhiteSpace(category))
-            throw new ArgumentException("Categoria é obrigatória");
+        Amount = type == TransactionType.Expense
+            ? -Math.Abs(amount)
+            : Math.Abs(amount);
+    }
 
+    private void SetDate(DateTime date)
+    {
         if (date == default)
-            throw new ArgumentException("Data inválida");
+            throw new InvalidOperationException("Data inválida");
+
+        Date = date;
+    }
+
+    private void SetCategory(string category)
+    {
+        if (string.IsNullOrWhiteSpace(category))
+            throw new InvalidOperationException("Categoria é obrigatória");
+
+        Category = category;
     }
 }

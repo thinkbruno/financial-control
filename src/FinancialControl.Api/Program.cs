@@ -1,14 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FinancialControl.Application.UseCases.Transactions;
-using FinancialControl.Domain.Interfaces;
-using FinancialControl.Infrastructure.Context;
-using FinancialControl.Infrastructure.Repositories;
-using FinancialControl.Domain.Validators;
-using Microsoft.EntityFrameworkCore;
+using FinancialControl.Infrastructure;
 using MassTransit;
-using FluentValidation;
-using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,18 +16,14 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<FinancialDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Infrastructure (DbContext, Repository, EventPublisher)
+builder.Services.AddInfrastructure(builder.Configuration);
 
-
-builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-
+// UseCases
 builder.Services.AddScoped<CreateTransactionUseCase>();
+builder.Services.AddScoped<GetAllTransactionsUseCase>();
 
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<TransactionValidator>();
-
-
+// CORS
 var reactUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:5173";
 var flutterUrl = "http://localhost:5174";
 
@@ -47,6 +37,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+// MassTransit (RabbitMQ)
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
@@ -58,8 +49,6 @@ builder.Services.AddMassTransit(x =>
         });
     });
 });
-
-builder.Services.AddScoped<GetAllTransactionsUseCase>();
 
 var app = builder.Build();
 

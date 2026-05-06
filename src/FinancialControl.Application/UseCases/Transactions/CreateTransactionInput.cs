@@ -1,3 +1,4 @@
+using System;
 using FinancialControl.Domain.Entities;
 namespace FinancialControl.Application.UseCases.Transactions;
 

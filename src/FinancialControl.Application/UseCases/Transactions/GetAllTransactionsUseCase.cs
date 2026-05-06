@@ -1,5 +1,8 @@
 using FinancialControl.Domain.Entities;
 using FinancialControl.Domain.Interfaces;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FinancialControl.Application.UseCases.Transactions;
 
@@ -12,7 +15,7 @@ public class GetAllTransactionsUseCase
         _repository = repository;
     }
 
-    public async Task<IEnumerable<Transaction>> Execute()
+    public async Task<IReadOnlyList<Transaction>> Execute()
     {
         return await _repository.GetAllAsync();
     }

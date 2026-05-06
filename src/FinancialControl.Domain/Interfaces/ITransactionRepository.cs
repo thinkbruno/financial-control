@@ -4,6 +4,7 @@ namespace FinancialControl.Domain.Interfaces;
 
 public interface ITransactionRepository
 {
-    Task AddAsync(Transaction transaction);
-    Task<IEnumerable<Transaction>> GetAllAsync();
+    Task AddAsync(Transaction transaction, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<Transaction>> GetAllAsync(CancellationToken cancellationToken = default);
 }

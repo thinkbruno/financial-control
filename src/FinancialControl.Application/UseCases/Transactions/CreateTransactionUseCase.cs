@@ -1,38 +1,33 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using FinancialControl.Domain.Entities;
 using FinancialControl.Domain.Interfaces;
 using FinancialControl.Domain.Events;
-using MassTransit;
+using FinancialControl.Application.Interfaces;
 
 namespace FinancialControl.Application.UseCases.Transactions;
 
 public class CreateTransactionUseCase
 {
     private readonly ITransactionRepository _repository;
-    private readonly IPublishEndpoint _publishEndpoint;
+    private readonly IEventPublisher _eventPublisher;
 
     public CreateTransactionUseCase(
         ITransactionRepository repository,
-        IPublishEndpoint publishEndpoint)
+        IEventPublisher eventPublisher)
     {
         _repository = repository;
-        _publishEndpoint = publishEndpoint;
+        _eventPublisher = eventPublisher;
     }
 
-    public async Task<Transaction> Execute(CreateTransactionInput input)
+    public async Task<Transaction> Execute(
+        CreateTransactionInput input,
+        CancellationToken cancellationToken = default)
     {
-        if (input == null)
+        if (input is null)
             throw new ArgumentNullException(nameof(input));
 
-        var transaction = CreateTransaction(input);
-
-        await Persist(transaction);
-        await PublishEvent(transaction);
-
-        return transaction;
-    }
-
-    private static Transaction CreateTransaction(CreateTransactionInput input)
-    {
         var transaction = Transaction.Create(
             input.Description,
             input.Amount,
@@ -40,22 +35,20 @@ public class CreateTransactionUseCase
             input.Type,
             input.Category
         );
-        return transaction;
-    }
-    private async Task Persist(Transaction transaction)
-    {
-        await _repository.AddAsync(transaction);
-    }
 
-    private async Task PublishEvent(Transaction transaction)
-    {
+        await _repository.AddAsync(transaction, cancellationToken);
+
         var @event = new TransactionCreatedEvent(
             transaction.Id,
             transaction.Amount,
             transaction.Description,
-            transaction.Type.ToString()
+            transaction.Type,
+            transaction.Category,
+            DateTime.UtcNow
         );
 
-        await _publishEndpoint.Publish(@event);
+        await _eventPublisher.PublishAsync(@event, cancellationToken);
+
+        return transaction;
     }
 }

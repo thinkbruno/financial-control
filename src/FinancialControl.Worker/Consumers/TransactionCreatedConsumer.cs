@@ -17,11 +17,11 @@ public class TransactionCreatedConsumer : IConsumer<TransactionCreatedEvent>
         var message = context.Message;
 
         // Log estruturado: facilita buscas em ferramentas como ElasticSearch ou Seq no futuro
-        _logger.LogInformation("Processando Transação Financeira: {Id} | Descrição: {Description} | Valor: {Amount}",
-            message.Id, message.Description, message.Amount);
+        _logger.LogInformation("Processando Transação Financeira: {TransactionId} | Descrição: {Description} | Valor: {Amount}",
+            message.TransactionId, message.Description, message.Amount);
 
         await Task.Delay(500); // Simulando trabalho
 
-        _logger.LogInformation("✅ Sucesso: Transação {Id} integrada ao sistema.", message.Id);
+        _logger.LogInformation("✅ Sucesso: Transação {TransactionId} integrada ao sistema.", message.TransactionId);
     }
 }

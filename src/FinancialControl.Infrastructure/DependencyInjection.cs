@@ -1,8 +1,5 @@
-using FinancialControl.Application.Interfaces;
-using FinancialControl.Domain.Interfaces;
 using FinancialControl.Infrastructure.Messaging;
 using FinancialControl.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,12 +11,9 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-
-        services.AddScoped<ITransactionRepository, TransactionRepository>();
-
-        services.AddScoped<IEventPublisher, EventPublisher>();
+        services
+            .AddPersistence(configuration)
+            .AddMessaging();
 
         return services;
     }

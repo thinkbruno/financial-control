@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FinancialControl.Application.UseCases.Transactions;
+namespace FinancialControl.Application.UseCases.Transactions.Queries.GetAllTransactions;
 
 public class GetAllTransactionsUseCase
 {

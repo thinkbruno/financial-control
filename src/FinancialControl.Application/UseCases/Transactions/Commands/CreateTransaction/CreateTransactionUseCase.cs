@@ -6,7 +6,7 @@ using FinancialControl.Domain.Interfaces;
 using FinancialControl.Domain.Events;
 using FinancialControl.Application.Interfaces;
 
-namespace FinancialControl.Application.UseCases.Transactions;
+namespace FinancialControl.Application.UseCases.Transactions.Commands.CreateTransaction;
 
 public class CreateTransactionUseCase
 {

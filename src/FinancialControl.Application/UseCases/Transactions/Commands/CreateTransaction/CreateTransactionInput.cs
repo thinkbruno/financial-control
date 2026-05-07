@@ -1,6 +1,6 @@
 using System;
 using FinancialControl.Domain.Entities;
-namespace FinancialControl.Application.UseCases.Transactions;
+namespace FinancialControl.Application.UseCases.Transactions.Commands.CreateTransaction;
 
 public class CreateTransactionInput
 {

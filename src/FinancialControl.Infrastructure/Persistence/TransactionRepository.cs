@@ -10,9 +10,9 @@ namespace FinancialControl.Infrastructure.Persistence;
 
 public class TransactionRepository : ITransactionRepository
 {
-    private readonly AppDbContext _context;
+    private readonly FinancialDbContext _context;
 
-    public TransactionRepository(AppDbContext context)
+    public TransactionRepository(FinancialDbContext context)
     {
         _context = context;
     }

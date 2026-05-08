@@ -17,20 +17,35 @@ public class TransactionRepository : ITransactionRepository
         _context = context;
     }
 
-    public async Task AddAsync(
-        Transaction transaction,
-        CancellationToken cancellationToken = default)
+    public async Task AddAsync(Transaction transaction)
     {
-        await _context.Transactions.AddAsync(transaction, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.Transactions.AddAsync(transaction);
+
+        await _context.SaveChangesAsync();
     }
 
-    public async Task<IReadOnlyList<Transaction>> GetAllAsync(
-        CancellationToken cancellationToken = default)
+    public async Task<List<Transaction>> GetAllAsync()
+    {
+        return await _context.Transactions.ToListAsync();
+    }
+
+    public async Task<Transaction?> GetByIdAsync(Guid id)
     {
         return await _context.Transactions
-            .AsNoTracking()
-            .OrderByDescending(x => x.Date)
-            .ToListAsync(cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task UpdateAsync(Transaction transaction)
+    {
+        _context.Transactions.Update(transaction);
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Transaction transaction)
+    {
+        _context.Transactions.Remove(transaction);
+
+        await _context.SaveChangesAsync();
     }
 }

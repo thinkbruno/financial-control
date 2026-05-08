@@ -2,21 +2,29 @@ namespace FinancialControl.Domain.Entities;
 
 public enum TransactionType
 {
-    Income,
-    Expense
+    Income = 1,
+    Expense = 2
 }
 
 public class Transaction
 {
     public Guid Id { get; private set; }
+
     public string Description { get; private set; } = null!;
+
     public decimal Amount { get; private set; }
+
     public DateTime Date { get; private set; }
+
     public TransactionType Type { get; private set; }
+
     public string Category { get; private set; } = null!;
+
     public DateTime CreatedAt { get; private set; }
 
-    private Transaction() { }
+    private Transaction()
+    {
+    }
 
     public static Transaction Create(
         string description,
@@ -32,11 +40,10 @@ public class Transaction
         };
 
         transaction.SetDescription(description);
-        transaction.SetAmount(amount, type);
+        transaction.SetType(type);
+        transaction.SetAmount(amount);
         transaction.SetDate(date);
         transaction.SetCategory(category);
-
-        transaction.Type = type;
 
         return transaction;
     }
@@ -45,10 +52,12 @@ public class Transaction
         string description,
         decimal amount,
         DateTime date,
+        TransactionType type,
         string category)
     {
         SetDescription(description);
-        SetAmount(amount, Type);
+        SetType(type);
+        SetAmount(amount);
         SetDate(date);
         SetCategory(category);
     }
@@ -58,15 +67,15 @@ public class Transaction
         if (string.IsNullOrWhiteSpace(description))
             throw new InvalidOperationException("Descrição é obrigatória");
 
-        Description = description;
+        Description = description.Trim();
     }
 
-    private void SetAmount(decimal amount, TransactionType type)
+    private void SetAmount(decimal amount)
     {
         if (amount <= 0)
             throw new InvalidOperationException("Valor deve ser maior que zero");
 
-        Amount = type == TransactionType.Expense
+        Amount = Type == TransactionType.Expense
             ? -Math.Abs(amount)
             : Math.Abs(amount);
     }
@@ -84,6 +93,14 @@ public class Transaction
         if (string.IsNullOrWhiteSpace(category))
             throw new InvalidOperationException("Categoria é obrigatória");
 
-        Category = category;
+        Category = category.Trim();
+    }
+
+    private void SetType(TransactionType type)
+    {
+        if (!Enum.IsDefined(typeof(TransactionType), type))
+            throw new InvalidOperationException("Tipo de transação inválido");
+
+        Type = type;
     }
 }

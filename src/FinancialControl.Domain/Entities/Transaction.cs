@@ -39,8 +39,8 @@ public class Transaction
             CreatedAt = DateTime.UtcNow
         };
 
-        transaction.SetDescription(description);
         transaction.SetType(type);
+        transaction.SetDescription(description);
         transaction.SetAmount(amount);
         transaction.SetDate(date);
         transaction.SetCategory(category);
@@ -55,8 +55,8 @@ public class Transaction
         TransactionType type,
         string category)
     {
-        SetDescription(description);
         SetType(type);
+        SetDescription(description);
         SetAmount(amount);
         SetDate(date);
         SetCategory(category);
@@ -65,7 +65,8 @@ public class Transaction
     private void SetDescription(string description)
     {
         if (string.IsNullOrWhiteSpace(description))
-            throw new InvalidOperationException("Descrição é obrigatória");
+            throw new InvalidOperationException(
+                "Descrição é obrigatória");
 
         Description = description.Trim();
     }
@@ -73,7 +74,8 @@ public class Transaction
     private void SetAmount(decimal amount)
     {
         if (amount <= 0)
-            throw new InvalidOperationException("Valor deve ser maior que zero");
+            throw new InvalidOperationException(
+                "Valor deve ser maior que zero");
 
         Amount = Type == TransactionType.Expense
             ? -Math.Abs(amount)
@@ -83,23 +85,29 @@ public class Transaction
     private void SetDate(DateTime date)
     {
         if (date == default)
-            throw new InvalidOperationException("Data inválida");
+            throw new InvalidOperationException(
+                "Data inválida");
 
-        Date = date;
+        Date = DateTime.SpecifyKind(
+            date,
+            DateTimeKind.Utc
+        );
     }
 
     private void SetCategory(string category)
     {
         if (string.IsNullOrWhiteSpace(category))
-            throw new InvalidOperationException("Categoria é obrigatória");
+            throw new InvalidOperationException(
+                "Categoria é obrigatória");
 
         Category = category.Trim();
     }
 
     private void SetType(TransactionType type)
     {
-        if (!Enum.IsDefined(typeof(TransactionType), type))
-            throw new InvalidOperationException("Tipo de transação inválido");
+        if (!Enum.IsDefined(type))
+            throw new InvalidOperationException(
+                "Tipo de transação inválido");
 
         Type = type;
     }

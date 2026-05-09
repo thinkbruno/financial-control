@@ -15,7 +15,10 @@ O projeto foi construído utilizando os princípios de:
 
 O objetivo principal deste projeto é estudar e aplicar conceitos modernos de arquitetura backend utilizando .NET 8.
 
-Além da API, o projeto também possui uma interface web em React para gerenciamento das transações financeiras.
+Além da API, o projeto também possui:
+
+- uma interface web em React;
+- uma aplicação mobile/desktop em Flutter.
 
 ---
 
@@ -33,7 +36,9 @@ A escolha dessa arquitetura foi feita propositalmente para permitir:
 
 Mesmo sendo um monólito, o sistema já foi estruturado de forma desacoplada, permitindo evolução gradual para uma arquitetura distribuída futuramente.
 
-### Estrutura do Projeto
+---
+
+## Estrutura do Projeto
 
 ```text
 FinancialControl.Api
@@ -41,10 +46,13 @@ FinancialControl.Application
 FinancialControl.Domain
 FinancialControl.Infrastructure
 FinancialControl.Worker
-FinancialControl.Frontend
+financial-control-frontend
+financial_control_mobile
 ```
 
-### Responsabilidades
+---
+
+## Responsabilidades
 
 | Projeto                         | Responsabilidade                      |
 | ------------------------------- | ------------------------------------- |
@@ -53,7 +61,8 @@ FinancialControl.Frontend
 | FinancialControl.Domain         | Regras de negócio e entidades         |
 | FinancialControl.Infrastructure | Banco de dados e integrações externas |
 | FinancialControl.Worker         | Processamento assíncrono de eventos   |
-| FinancialControl.Frontend       | Interface web React                   |
+| financial-control-frontend      | Interface web React                   |
+| financial_control_mobile        | Aplicação Flutter                     |
 
 ---
 
@@ -70,13 +79,18 @@ FinancialControl.Frontend
 - xUnit
 - Moq
 
-### Frontend
+### Frontend Web
 
 - React
 - TypeScript
 - Vite
 - Axios
 - TailwindCSS
+
+### Mobile/Desktop
+
+- Flutter
+- Dart
 
 ### DevOps
 
@@ -91,6 +105,8 @@ FinancialControl.Frontend
 - Listar transações
 - Atualizar transações
 - Remover transações
+- Dashboard financeiro
+- Totalizador de saldo
 - Processamento assíncrono com eventos
 - Testes unitários
 - API documentada com Swagger
@@ -99,9 +115,19 @@ FinancialControl.Frontend
 
 ## Interface Web
 
-### Dashboard funcionando
+### Dashboard React
 
-![Dashboard](./docs/dashboard.png)
+![Dashboard React](./docs/dashboard.png)
+
+---
+
+## Interface Flutter
+
+### Dashboard Flutter
+
+![Dashboard Flutter](./docs/dashboard_flutter.png)
+
+---
 
 ## Como Executar
 
@@ -111,7 +137,9 @@ FinancialControl.Frontend
 docker compose up --build
 ```
 
-### Backend
+---
+
+## Backend
 
 API:
 
@@ -125,7 +153,29 @@ Swagger:
 http://localhost:8080/swagger
 ```
 
-### Frontend
+---
+
+## Frontend React
+
+Entrar na pasta:
+
+```bash
+cd src/financial-control-frontend
+```
+
+Instalar dependências:
+
+```bash
+npm install
+```
+
+Executar:
+
+```bash
+npm run dev
+```
+
+Aplicação:
 
 ```text
 http://localhost:5173
@@ -133,12 +183,53 @@ http://localhost:5173
 
 ---
 
+## Frontend Flutter
+
+Entrar na pasta:
+
+```bash
+cd src/financial_control_mobile
+```
+
+Instalar dependências:
+
+```bash
+flutter pub get
+```
+
+Executar:
+
+```bash
+flutter run
+```
+
+---
+
+## Observação sobre o Flutter
+
+A aplicação Flutter está sendo executada fora do Docker propositalmente.
+
+O objetivo é utilizar o projeto também como ambiente de estudo da stack Flutter, permitindo:
+
+- entendimento do ecossistema Flutter;
+- execução local simplificada;
+- debug mais rápido;
+- aprendizado da configuração nativa;
+- testes em Linux, Android e Web futuramente.
+
+Em um cenário de produção, a aplicação pode ser facilmente adaptada para conteinerização e pipelines CI/CD.
+
+---
+
 ## Executar Migrations
+
+Caso o banco esteja rodando via Docker:
 
 ```bash
 dotnet ef database update \
   --project src/FinancialControl.Infrastructure \
-  --startup-project src/FinancialControl.Api
+  --startup-project src/FinancialControl.Api \
+  --connection "Host=localhost;Port=5440;Database=financial_control;Username=postgres;Password=postgres"
 ```
 
 ---
@@ -160,6 +251,7 @@ Este projeto está sendo utilizado como laboratório prático para aprofundament
 - comunicação assíncrona;
 - testes automatizados;
 - conteinerização;
+- Flutter;
 - organização de sistemas escaláveis.
 
 A ideia é evoluir gradualmente a aplicação, mantendo uma base sólida e preparada para crescimento.
@@ -174,6 +266,7 @@ A ideia é evoluir gradualmente a aplicação, mantendo uma base sólida e prepa
 - CI/CD;
 - observabilidade;
 - deploy em cloud;
+- sincronização offline no Flutter;
 - possível separação futura em microserviços.
 
 ---
@@ -184,4 +277,4 @@ Bruno Ramos
 
 Portfolio:
 
-[www.brunoramos.tec.br](http://www.brunoramos.tec.br)
+[www.brunoramos.tec.br](https://www.brunoramos.tec.br)

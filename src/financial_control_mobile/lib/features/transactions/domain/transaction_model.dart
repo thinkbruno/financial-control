@@ -2,6 +2,7 @@ class TransactionModel {
   final String id;
   final String description;
   final double amount;
+  final String category;
   final String type;
   final DateTime date;
 
@@ -9,6 +10,7 @@ class TransactionModel {
     required this.id,
     required this.description,
     required this.amount,
+    required this.category,
     required this.type,
     required this.date,
   });
@@ -18,7 +20,8 @@ class TransactionModel {
       id: json['id'],
       description: json['description'],
       amount: (json['amount'] as num).toDouble(),
-      type: json['type'],
+      category: json['category'],
+      type: json['type'].toString(),
       date: DateTime.parse(json['date']),
     );
   }
